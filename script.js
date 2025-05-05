@@ -1,9 +1,25 @@
-const shapes = ['🔺', '🔵', '🟢', '🟡', '🔶', '🟣', '🔻', '🟠'];
-const doubleShapes = [...shapes, ...shapes]; // Duplicate for pairs
+const allShapes = ['🔺', '🔵', '🟢', '🟡', '🔶', '🟣', '🔻', '🟠', '🔷', '⬛', '⬜', '🔳'];
+let level = 1;
 let flippedCards = [];
 let matchedCards = [];
 const gameBoard = document.getElementById('gameboard');
 const resetButton = document.getElementById('reset');
+const levelDisplay = document.getElementById('level');
+
+// Create next level button
+const nextLevelButton = document.createElement('a');
+nextLevelButton.href = '#';
+nextLevelButton.textContent = 'Next Level';
+nextLevelButton.classList.add('next-level');
+nextLevelButton.style.display = 'none';
+document.querySelector('.actions').appendChild(nextLevelButton);
+
+nextLevelButton.addEventListener('click', () => {
+  level++;
+  levelDisplay.textContent = level;
+  createBoard();
+  nextLevelButton.style.display = 'none';
+});
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -13,6 +29,10 @@ function shuffle(array) {
 }
 
 function createBoard() {
+  const shapeCount = Math.min(level * 2, allShapes.length);
+  const levelShapes = allShapes.slice(0, shapeCount);
+  const doubleShapes = [...levelShapes, ...levelShapes];
+
   shuffle(doubleShapes);
   gameBoard.innerHTML = '';
   flippedCards = [];
@@ -50,8 +70,11 @@ function checkMatch() {
     card2.classList.add('matched');
     matchedCards.push(card1, card2);
     flippedCards = [];
-    if (matchedCards.length === doubleShapes.length) {
-      setTimeout(() => alert("You've matched all the cards!"), 200);
+    if (matchedCards.length === level * 4) {
+      setTimeout(() => {
+        alert(`Great job! Level ${level} completed.`);
+        nextLevelButton.style.display = 'inline-block';
+      }, 500);
     }
   } else {
     setTimeout(() => {
@@ -64,6 +87,11 @@ function checkMatch() {
   }
 }
 
-resetButton.addEventListener('click', createBoard);
+resetButton.addEventListener('click', () => {
+  level = 1;
+  levelDisplay.textContent = level;
+  createBoard();
+  nextLevelButton.style.display = 'none';
+});
 
-createBoard(); // Initialize
+createBoard();
